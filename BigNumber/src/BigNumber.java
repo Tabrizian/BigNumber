@@ -2,19 +2,20 @@ public class BigNumber {
 	private String number;
 
 	public BigNumber(String number) {
-		StringBuilder strBuild = new StringBuilder(number);
-		this.number = strBuild.reverse().toString();
+		this.number = number;
 	}
 
 	public int getAt(int i) {
-		return Integer.parseInt(number.charAt(i) + "");
+		return Integer.parseInt(number.charAt(number.length() - i - 1) + "");
 	}
 
 	public BigNumber add(BigNumber num2) {
 		StringBuilder num = new StringBuilder();
-		num.reverse();
 		int remain = 0;
-		for (int i = 0; i < number.length(); i++) {
+		int length = number.length();
+		if(length < num2.number.length())
+			length = num2.number.length();
+		for (int i = 0; i < length; i++) {
 			int number1 = 0;
 			try {
 				number1 = this.getAt(i);
@@ -33,12 +34,12 @@ public class BigNumber {
 		}
 		if (remain > 0)
 			num.append(remain);
+		num = num.reverse();
 		return new BigNumber(num.toString());
 	}
 
 	public BigNumber subtract(BigNumber num2) {
 		StringBuilder num = new StringBuilder();
-		num.reverse();
 		int remain = 0;
 		boolean subtracted = false;
 		for (int i = 0; i < number.length(); i++) {
@@ -72,6 +73,7 @@ public class BigNumber {
 		}
 		if (remain > 0)
 			num.append(remain);
+		num.reverse();
 		return new BigNumber(num.toString());
 	}
 
@@ -79,27 +81,28 @@ public class BigNumber {
 		StringBuilder strbuild = new StringBuilder(number);
 
 		try {
-			return new BigNumber(strbuild.substring(m).toString());
+			return new BigNumber(strbuild.substring(0, number.length() - m).toString());
 		} catch (Exception e) {
 			return new BigNumber("0");
 		}
-		
+
 	}
 
 	public BigNumber remain10(int m) {
 		StringBuilder strbuild = new StringBuilder(number);
 		try {
-			strbuild = new StringBuilder(strbuild.substring(0, m));
-			return new BigNumber(strbuild.reverse().toString());
+			strbuild = new StringBuilder(strbuild.substring(number.length() 
+					- m, number.length()));
+			return new BigNumber(strbuild.toString());
 		} catch (Exception e) {
 			return new BigNumber(number);
 		}
 	}
-	
+
 	public BigNumber multiply10(int m) {
 		StringBuilder strbuild = new StringBuilder(number);
 		for (int i = 0; i < m; i++) {
-			strbuild.insert(0, '0');
+			strbuild.insert(number.length(), '0');
 		}
 		return new BigNumber(strbuild.toString());
 	}
@@ -127,10 +130,17 @@ public class BigNumber {
 			y = this.remain10(m);
 			w = num.divide10(m);
 			z = num.remain10(m);
-			r = x.add(y).multiply(w.add(z));
+			BigNumber xSumy = x.add(y);
+			BigNumber wSumz = w.add(z);
+			r = xSumy.multiply(wSumz);
+			
 			p = x.multiply(w);
 			q = y.multiply(z);
-			return p.multiply10(2*m).add(r.subtract(p.add(q)).multiply10(m)).add(q);
+			BigNumber pmultiply = p.multiply10(2 * m);
+			BigNumber pSumq = p.add(q);
+			BigNumber rMinuspSumq = r.subtract(pSumq);
+			return pmultiply.add(rMinuspSumq.multiply10(m))
+					.add(q);
 		}
 	}
 
@@ -140,7 +150,11 @@ public class BigNumber {
 			if (c != '0')
 				return false;
 		}
-		return true;
+		if(number == null)
+			return true;
+		else
+			return true;
+			
 	}
 
 	public int compare(BigNumber num) {
