@@ -3,12 +3,18 @@ public class BigNumber {
 	private boolean negative = false;
 
 	public BigNumber(String number) {
+		StringBuilder num = new StringBuilder(number);
+
+		while (num.length() >= 1 && num.charAt(0) == '0') {
+			num.deleteCharAt(0);
+		}
+
 		if (number.charAt(0) == '-') {
 			negative = true;
-			this.number = number.substring(1, number.length());
+			this.number = num.substring(1, number.length());
 
 		} else {
-			this.number = number;
+			this.number = num.toString();
 		}
 	}
 
@@ -43,10 +49,10 @@ public class BigNumber {
 
 			remain = temp / 10;
 			temp = temp % 10;
-
-			num.append(temp);
+			num.insert(0, temp);
 		}
-
+		if (remain > 0)
+			num.insert(0, remain);
 		return new BigNumber(num.toString());
 
 	}
@@ -122,11 +128,11 @@ public class BigNumber {
 					}
 				} else {
 					num.negate();
-					if (num.compare(this) == 1) {
+					if (this.compare(num) == 1) {
+						ans = this.subtract(num);
+					} else {
 						ans = num.subtract(this);
 						ans.negate();
-					} else {
-						ans = this.subtract(num);
 					}
 				}
 			}
@@ -167,11 +173,11 @@ public class BigNumber {
 			remain = temp / 10;
 			temp = temp % 10;
 
-			num.append(temp);
+			num.insert(0, temp);
 		}
 		if (remain > 0)
 			num.append(remain);
-		num.reverse();
+
 		return new BigNumber(num.toString());
 	}
 
@@ -261,9 +267,9 @@ public class BigNumber {
 	public int compare(BigNumber num) {
 		int difference = num.number.compareTo(number);
 		if (difference > 0)
-			return 1;
-		else if (difference < 0)
 			return -1;
+		else if (difference < 0)
+			return +1;
 		else
 			return 0;
 	}
