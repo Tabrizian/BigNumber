@@ -1,8 +1,15 @@
 public class BigNumber {
 	private String number;
+	private boolean negative = false;
 
 	public BigNumber(String number) {
-		this.number = number;
+		if (number.charAt(0) == '-') {
+			negative = true;
+			this.number = number.substring(1, number.length());
+
+		} else {
+			this.number = number;
+		}
 	}
 
 	public int getAt(int i) {
@@ -12,30 +19,122 @@ public class BigNumber {
 	public BigNumber add(BigNumber num2) {
 		StringBuilder num = new StringBuilder();
 		int remain = 0;
+		boolean subtracted = false;
 		int length = number.length();
-		if(length < num2.number.length())
+		if (length < num2.number.length())
 			length = num2.number.length();
+
 		for (int i = 0; i < length; i++) {
 			int number1 = 0;
 			try {
 				number1 = this.getAt(i);
 			} catch (Exception e) {
 			}
+			if (subtracted) {
+				number1--;
+			}
 			int number2 = 0;
 			try {
 				number2 = num2.getAt(i);
 			} catch (Exception e) {
 			}
+
 			int temp = number1 + number2 + remain;
+
 			remain = temp / 10;
 			temp = temp % 10;
 
 			num.append(temp);
 		}
-		if (remain > 0)
-			num.append(remain);
-		num = num.reverse();
+
 		return new BigNumber(num.toString());
+
+	}
+
+	public BigNumber manage(BigNumber num, char operator) {
+		BigNumber ans = null;
+		switch (operator) {
+		case '*':
+			if (!(this.negative ^ num.negative)) {
+				if (this.negative) {
+					negate();
+					num.negate();
+				}
+				ans = this.multiply(num);
+			} else {
+				if (this.negative)
+					this.negate();
+				else
+					num.negate();
+				ans = this.multiply(num);
+				ans.negate();
+			}
+			break;
+		case '+':
+			if (!(this.negative ^ num.negative)) {
+				if (this.negative) {
+					negate();
+					num.negate();
+					ans = num.add(this);
+					ans.negate();
+				} else {
+					ans = num.add(this);
+				}
+			} else {
+				if (this.negative) {
+					negate();
+					if (num.compare(this) == 1) {
+						ans = num.subtract(this);
+					} else {
+						ans = this.subtract(num);
+						ans.negate();
+					}
+				} else {
+					num.negate();
+					if (num.compare(this) == 1) {
+						ans = num.subtract(this);
+						ans.negate();
+					} else {
+						ans = this.subtract(num);
+					}
+				}
+			}
+			break;
+		case '-':
+			num.negate();
+			if (!(this.negative ^ num.negative)) {
+				if (this.negative) {
+					negate();
+					num.negate();
+					ans = num.add(this);
+					ans.negate();
+				} else {
+					ans = num.add(this);
+				}
+			} else {
+				if (this.negative) {
+					negate();
+					if (num.compare(this) == 1) {
+						ans = num.subtract(this);
+					} else {
+						ans = this.subtract(num);
+						ans.negate();
+					}
+				} else {
+					num.negate();
+					if (num.compare(this) == 1) {
+						ans = num.subtract(this);
+						ans.negate();
+					} else {
+						ans = this.subtract(num);
+					}
+				}
+			}
+			break;
+		}
+
+		return ans;
+
 	}
 
 	public BigNumber subtract(BigNumber num2) {
@@ -43,7 +142,6 @@ public class BigNumber {
 		int remain = 0;
 		boolean subtracted = false;
 		for (int i = 0; i < number.length(); i++) {
-
 			int number1 = 0;
 			try {
 				number1 = this.getAt(i);
@@ -81,7 +179,8 @@ public class BigNumber {
 		StringBuilder strbuild = new StringBuilder(number);
 
 		try {
-			return new BigNumber(strbuild.substring(0, number.length() - m).toString());
+			return new BigNumber(strbuild.substring(0, number.length() - m)
+					.toString());
 		} catch (Exception e) {
 			return new BigNumber("0");
 		}
@@ -91,12 +190,16 @@ public class BigNumber {
 	public BigNumber remain10(int m) {
 		StringBuilder strbuild = new StringBuilder(number);
 		try {
-			strbuild = new StringBuilder(strbuild.substring(number.length() 
-					- m, number.length()));
+			strbuild = new StringBuilder(strbuild.substring(
+					number.length() - m, number.length()));
 			return new BigNumber(strbuild.toString());
 		} catch (Exception e) {
 			return new BigNumber(number);
 		}
+	}
+
+	public void negate() {
+		this.negative = !this.negative;
 	}
 
 	public BigNumber multiply10(int m) {
@@ -133,14 +236,12 @@ public class BigNumber {
 			BigNumber xSumy = x.add(y);
 			BigNumber wSumz = w.add(z);
 			r = xSumy.multiply(wSumz);
-			
 			p = x.multiply(w);
 			q = y.multiply(z);
 			BigNumber pmultiply = p.multiply10(2 * m);
 			BigNumber pSumq = p.add(q);
 			BigNumber rMinuspSumq = r.subtract(pSumq);
-			return pmultiply.add(rMinuspSumq.multiply10(m))
-					.add(q);
+			return pmultiply.add(rMinuspSumq.multiply10(m)).add(q);
 		}
 	}
 
@@ -150,19 +251,29 @@ public class BigNumber {
 			if (c != '0')
 				return false;
 		}
-		if(number == null)
+		if (number == null)
 			return true;
 		else
 			return true;
-			
+
 	}
 
 	public int compare(BigNumber num) {
-		return num.number.compareTo(number);
+		int difference = num.number.compareTo(number);
+		if (difference > 0)
+			return 1;
+		else if (difference < 0)
+			return -1;
+		else
+			return 0;
 	}
 
 	@Override
 	public String toString() {
-		return number;
+		if (negative)
+			return "-" + number;
+		else {
+			return number;
+		}
 	}
 }
