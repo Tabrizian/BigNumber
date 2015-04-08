@@ -1,4 +1,4 @@
-public class BigNumber {
+public class BigNumber implements Comparable<BigNumber> {
 	private String number;
 	private boolean negative = false;
 
@@ -9,7 +9,7 @@ public class BigNumber {
 			num.deleteCharAt(0);
 		}
 
-		if (number.charAt(0) == '-') {
+		if (num.length() >= 1 && number.charAt(0) == '-') {
 			negative = true;
 			this.number = num.substring(1, number.length());
 
@@ -89,7 +89,7 @@ public class BigNumber {
 			} else {
 				if (this.negative) {
 					negate();
-					if (num.compare(this) == 1) {
+					if (num.compareMagnitude(this) == 1) {
 						ans = num.subtract(this);
 					} else {
 						ans = this.subtract(num);
@@ -97,7 +97,7 @@ public class BigNumber {
 					}
 				} else {
 					num.negate();
-					if (num.compare(this) == 1) {
+					if (num.compareMagnitude(this) == 1) {
 						ans = num.subtract(this);
 						ans.negate();
 					} else {
@@ -120,7 +120,7 @@ public class BigNumber {
 			} else {
 				if (this.negative) {
 					negate();
-					if (num.compare(this) == 1) {
+					if (num.compareMagnitude(this) == 1) {
 						ans = num.subtract(this);
 					} else {
 						ans = this.subtract(num);
@@ -128,7 +128,7 @@ public class BigNumber {
 					}
 				} else {
 					num.negate();
-					if (this.compare(num) == 1) {
+					if (this.compareMagnitude(num) == 1) {
 						ans = this.subtract(num);
 					} else {
 						ans = num.subtract(this);
@@ -264,7 +264,7 @@ public class BigNumber {
 
 	}
 
-	public int compare(BigNumber num) {
+	public int compareMagnitude(BigNumber num) {
 		int difference = num.number.compareTo(number);
 		if (difference > 0)
 			return -1;
@@ -276,10 +276,31 @@ public class BigNumber {
 
 	@Override
 	public String toString() {
-		if (negative)
-			return "-" + number;
+		if (isZero())
+			return "0";
 		else {
-			return number;
+			if (negative)
+				return "-" + number;
+			else {
+				return number;
+			}
+		}
+	}
+
+	@Override
+	public int compareTo(BigNumber o) {
+		if (!(this.negative ^ o.negative)) {
+			if (this.negative)
+				return -this.compareMagnitude(o);
+			else
+				return this.compareMagnitude(o);
+		} else {
+			if (this.negative)
+				return -1;
+			else if (this.isZero() && o.isZero())
+				return 0;
+			else
+				return 1;
 		}
 	}
 }
