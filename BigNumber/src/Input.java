@@ -13,12 +13,20 @@ public class Input {
 					.toString();
 		} else if (s.indexOf('<') != -1) {
 			args = s.split("<");
-			ans = String.valueOf(new BigNumber(args[0])
-					.compareTo((new BigNumber(args[1]))));
-		} else if (s.indexOf('>') != -1) {
-			args = s.split(">");
 			ans = String.valueOf(new BigNumber(args[1])
 					.compareTo((new BigNumber(args[0]))));
+			if(ans.equals("1"))
+				ans = "True";
+			else
+				ans ="False";
+		} else if (s.indexOf('>') != -1) {
+			args = s.split(">");
+			ans = String.valueOf(new BigNumber(args[0])
+					.compareTo((new BigNumber(args[1]))));
+			if(ans.equals("1"))
+				ans = "True";
+			else
+				ans ="False";
 		} else if (s.indexOf('-') != -1) {
 			args = s.split("-");
 			if (args.length == 3) {

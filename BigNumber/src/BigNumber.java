@@ -266,12 +266,20 @@ public class BigNumber implements Comparable<BigNumber> {
 
 	public int compareMagnitude(BigNumber num) {
 		int difference = num.number.compareTo(number);
-		if (difference > 0)
+		if (num.number.length() == number.length()) {
+			if (difference > 0)
+				return -1;
+			else if (difference < 0)
+				return +1;
+			else
+				return 0;
+		}
+		else if(num.number.length() < number.length()){
+			return 1;
+		}
+		else{
 			return -1;
-		else if (difference < 0)
-			return +1;
-		else
-			return 0;
+		}
 	}
 
 	@Override
